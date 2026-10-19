@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Study Notes</string>
+    <string name="title_hint">Note title</string>
+    <string name="body_hint">Write your note here</string>
+    <string name="save_button">Save note</string>
+    <string name="clear_button">clear note</string>
+    <string name="no_title">Give your note a title first</string>
+    <string name="saved_format">Saved: %1$s</string>
+    <string name="category_label">Category</string>
+    <string name="cat_study">Study</string>
+    <string name="cat_work">Work</string>
+    <string name="cat_personal">Personal</string>
+    <string name="important_label">Important</string>
+    <string name="remind_label">Remind me About this</string>
+    <string name="summary_format">%1$s . %2$s%3$s</string>
+    <string name="important_marker"> . IMPORTANT</string>
+    <string name="share_button">Share</string>
+    <string name="done_button">Done</string>
+
+
+</resources>
