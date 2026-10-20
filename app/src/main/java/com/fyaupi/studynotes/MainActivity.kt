@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.RadioButton
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels                              // LAB 7
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fyaupi.studynotes.databinding.ActivityMainBinding
@@ -15,7 +16,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val TAG = "StudyNotesLife"
 
-    private val notes = mutableListOf<Note>()
+    private val viewModel: NoteViewModel by viewModels()
+    private var currentNotes = listOf<Note>()
     private lateinit var adapter: NoteAdapter
 
     private val detailLauncher = registerForActivityResult(
@@ -30,9 +32,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart()   { super.onStart();   Log.i(TAG, "onStart") }
     override fun onResume()  { super.onResume();  Log.i(TAG, "onResume") }
     override fun onPause()   { super.onPause();   Log.i(TAG, "onPause") }
-    override fun onStop()
-    { super.onStop()
-        Log.i(TAG, "onStop") }
+    override fun onStop()    { super.onStop();    Log.i(TAG, "onStop") }
     override fun onRestart() { super.onRestart(); Log.i(TAG, "onRestart") }
     override fun onDestroy() { super.onDestroy(); Log.i(TAG, "onDestroy") }
 
@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         outState.putString("statusText", binding.statusText.text.toString())
         outState.putBoolean("important", binding.importantSwitch.isChecked)
     }
+
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         Log.i(TAG, "onRestoreInstanceState")
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        adapter = NoteAdapter(notes) { note ->
+        adapter = NoteAdapter(currentNotes) { note ->
             val intent = Intent(this, NoteDetailActivity::class.java).apply {
                 putExtra("noteTitle", note.title)
                 putExtra("noteBody", note.body)
@@ -65,6 +66,11 @@ class MainActivity : AppCompatActivity() {
         }
         binding.noteList.layoutManager = LinearLayoutManager(this)
         binding.noteList.adapter = adapter
+
+        viewModel.allNotes.observe(this) { list ->
+            currentNotes = list
+            adapter.submit(list)
+        }
 
         if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain") {
             intent.getStringExtra(Intent.EXTRA_TEXT)?.let { shared ->
@@ -115,9 +121,14 @@ class MainActivity : AppCompatActivity() {
                 Log.i("StudyNotes", "Reminder wanted for: $title")
             }
 
-            notes.add(0, Note(title, binding.bodyInput.text.toString(), category, important))
-            adapter.notifyItemInserted(0)
-            binding.noteList.scrollToPosition(0)
+            viewModel.insert(
+                Note(
+                    title = title,
+                    body = binding.bodyInput.text.toString(),
+                    category = category,
+                    important = important
+                )
+            )
             binding.titleInput.text.clear()
             binding.bodyInput.text.clear()
         }

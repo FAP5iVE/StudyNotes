@@ -7,10 +7,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class NoteAdapter(
-    private val notes: List<Note>,
+    private var notes: List<Note>,
     private val onClick: (Note) -> Unit
 ) : RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
 
+    fun submit(newNotes: List<Note>) {
+        notes = newNotes
+        notifyDataSetChanged()
+    }
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.cardTitle)
         val subtitle: TextView = itemView.findViewById(R.id.cardSubtitle)
